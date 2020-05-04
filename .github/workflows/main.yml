@@ -46,7 +46,7 @@ jobs:
         # Token to authenticate the request
         token: ${{ secrets.DEPLOY_TOKEN }}
         # The ref to deploy. This can be a branch, tag, or SHA.
-        ref: v${{ env.VERSION_NUMBER }}
+        ref: "${{github.sha}}"
         # Specifies a task to execute (e.g., `deploy` or `deploy:migrations`).
         task: "deploy-after-merge"
         # JSON payload with extra information about the deployment.
