@@ -1,0 +1,66 @@
+# just pretending this is the main workflow
+name: Main
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name : Print GitHub context (for debug)
+      env: 
+        GITHUB_CONTEXT: ${{ toJson(github) }} 
+      run: echo "$GITHUB_CONTEXT"
+
+    - name: Unit Tests
+      run: echo "UNIT TESTS ARE GREEN OBVIOUSLY"
+
+  build:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+    - name: Generate version number
+      run: echo "GENERATE VERSION NUMBER"
+    - name: Build and push Docker images
+      run: echo "Imagine we have published a docker image here"
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Create a new Github Deployment to staging env
+      uses: maxkomarychev/oction-create-deployment@v0.7.1
+      with:
+        # Token to authenticate the request
+        token: "THE_TOKEN"
+        # The ref to deploy. This can be a branch, tag, or SHA.
+        ref: "${{github.sha}}"
+        # Specifies a task to execute (e.g., `deploy` or `deploy:migrations`).
+        task: "deploy-after-merge"
+        # JSON payload with extra information about the deployment.
+        payload: "{reason: \"merge-to-master\"}"
+        # Name for the target deployment environment (e.g., `production`, `staging`, `qa`).
+        environment: staging
+        # Short description of the deployment.
+        description: "automatic when merging to master"
+        # Specifies if the given environment is one that end-users directly interact with. Default: `true` when `environment` is `production` and `false` otherwise.   **Note:** This parameter requires you to use the [`application/vnd.github.ant-man-preview+json`](https://developer.github.com/v3/previews/#enhanced-deployments) custom media type.
+        production_environment: false
+    - name: Success  Notification
+      if: success()
+      run: echo "IT WORKED !"
+    - name: Failure Notification
+      if: failure()
+      run: echo "IT FAILED"
