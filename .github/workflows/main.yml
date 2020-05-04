@@ -32,22 +32,21 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v2
     - name: Generate version number
-      run: echo "GENERATE VERSION NUMBER"
+      run: echo "::set-env name=VERSION_NUMBER::$(date '+%y%m.%d%H.%M')"
     - name: Build and push Docker images
       run: echo "Imagine we have published a docker image here"
-
-  deploy:
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-18.04
-    steps:
+    - name: push tag
+      uses: hole19/git-tag-action@master
+      env:
+        TAG: "v${{env.VERSION_NUMBER}}"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Create a new Github Deployment to staging env
       uses: maxkomarychev/oction-create-deployment@v0.7.1
       with:
         # Token to authenticate the request
         token: ${{ secrets.DEPLOY_TOKEN }}
         # The ref to deploy. This can be a branch, tag, or SHA.
-        ref: "${{github.sha}}"
+        ref: "v${{env.VERSION_NUMBER}}"
         # Specifies a task to execute (e.g., `deploy` or `deploy:migrations`).
         task: "deploy-after-merge"
         # JSON payload with extra information about the deployment.
