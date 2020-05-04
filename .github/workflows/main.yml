@@ -59,7 +59,7 @@ jobs:
         # Specifies if the given environment is one that end-users directly interact with. Default: `true` when `environment` is `production` and `false` otherwise.   **Note:** This parameter requires you to use the [`application/vnd.github.ant-man-preview+json`](https://developer.github.com/v3/previews/#enhanced-deployments) custom media type.
         production_environment: false
         # ignore current checks of branch for now, to prevent : 
-        #[{"context":"test","state":"success"},{"context":"build","state":"success"},{"context":"deploy","state":"in_progress"}],"resource":"Deployment","field":"required_contexts","code":"invalid"}
+        # [{"context":"test","state":"success"},{"context":"build","state":"success"},{"context":"deploy","state":"in_progress"}],"resource":"Deployment","field":"required_contexts","code":"invalid"}
         required_contexts: "[]""
     - name: Success  Notification
       if: success()
