@@ -27,7 +27,7 @@ jobs:
 
       - run: |
           echo 'Performing the deployment...'
-          sleep 10
+          sleep 40
 
       - name: update deployment status
         uses: bobheadxi/deployments@v0.4.3
