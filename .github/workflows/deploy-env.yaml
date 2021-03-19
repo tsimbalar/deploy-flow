@@ -12,7 +12,7 @@ jobs:
     environment:
       name: ${{ github.event.inputs.env_name }}
   steps:
-    - name: Create Github Deployment for ${{ github.event.inputs.env_name }}
+    - name: "Create Github Deployment for ${{ github.event.inputs.env_name }}"
       id: gh-deployment
       uses: avakar/create-deployment@v1
       with:
