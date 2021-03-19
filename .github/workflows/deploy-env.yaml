@@ -53,7 +53,7 @@ jobs:
       - name: Kicking off the deployment
         uses: avakar/set-deployment-status@v1
         with:
-          deployment_id: ${{ steps.gh-deployment.deployment_id }}
+          deployment_id: ${{ steps.gh-deployment.outputs.deployment_id }}
           # required, one of error, failure, inactive, in_progress, queued, pending, or success.
           state: in_progress
           description: Starting ....
@@ -66,7 +66,7 @@ jobs:
       - name: Update on current deployment
         uses: avakar/set-deployment-status@v1
         with:
-          deployment_id: ${{ steps.gh-deployment.deployment_id }}
+          deployment_id: ${{ steps.gh-deployment.outputs.deployment_id }}
           # required, one of error, failure, inactive, in_progress, queued, pending, or success.
           state: in_progress
           description: Still working on it.
@@ -76,7 +76,7 @@ jobs:
 
       - uses: avakar/set-deployment-status@v1
         with:
-          deployment_id: ${{ steps.gh-deployment.deployment_id }}
+          deployment_id: ${{ steps.gh-deployment.outputs.deployment_id }}
           state: success
           description: We reached the end
           log_url: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
@@ -86,6 +86,7 @@ jobs:
       - uses: avakar/set-deployment-status@v1
         if: failure()
         with:
+          deployment_id: ${{ steps.gh-deployment.outputs.deployment_id }}
           state: failure
           description: Something went wrong ...
           log_url: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
