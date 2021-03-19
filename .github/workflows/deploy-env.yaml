@@ -27,7 +27,7 @@ jobs:
           # this parameter, GitHub verifies all unique contexts before creating
           # a deployment. To bypass checking entirely, pass an empty array.
           # Defaults to all unique contexts.
-          required_contexts: ''
+          required_contexts: ""
           # JSON payload with extra information about the deployment. Default: ""
           payload: ""
           # Name for the target deployment environment (e.g., production, staging, qa).
@@ -42,5 +42,52 @@ jobs:
           # Specifies if the given environment is specific to the deployment
           # and will no longer exist at some point in the future. Default: false
           transient_environment: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print steps result (for debug)
+        env:
+          GITHUB_CONTEXT: ${{ toJson(steps.gh-deployment) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - name: Kicking off the deployment
+        uses: avakar/set-deployment-status@v1
+        with:
+          deployment_id: ${{ steps.gh-deployment.deployment_id }}
+          # required, one of error, failure, inactive, in_progress, queued, pending, or success.
+          state: in_progress
+          description: Starting ....
+          log_url: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
+
+      - run: |
+          echo 'Performing the deployment...'
+          sleep 10
+
+      - name: Update on current deployment
+        uses: avakar/set-deployment-status@v1
+        with:
+          deployment_id: ${{ steps.gh-deployment.deployment_id }}
+          # required, one of error, failure, inactive, in_progress, queued, pending, or success.
+          state: in_progress
+          description: Still working on it.
+          log_url: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: avakar/set-deployment-status@v1
+        with:
+          deployment_id: ${{ steps.gh-deployment.deployment_id }}
+          state: success
+          description: We reached the end
+          log_url: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: avakar/set-deployment-status@v1
+        if: failure()
+        with:
+          state: failure
+          description: Something went wrong ...
+          log_url: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
