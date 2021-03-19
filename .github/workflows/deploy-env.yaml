@@ -1,0 +1,46 @@
+name: deploy-env
+on:
+  workflow_dispatch:
+    inputs:
+      env_name:
+        description: "Name of environment to deploy"
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-18.04
+    environment:
+      name: ${{ github.event.inputs.env_name }}
+  steps:
+    - name: Create Github Deployment for ${{ github.event.inputs.env_name }}
+      id: gh-deployment
+      uses: avakar/create-deployment@v1
+      with:
+        #  The ref to deploy. This can be a branch, tag, or SHA.
+        ref: ""
+        # Specifies a task to execute. Default: "deploy"
+        task: "deploy"
+        # Attempts to automatically merge the default branch into the requested ref,
+        # if it's behind the default branch. Default: true
+        auto_merge: false
+        # The status contexts to verify against commit status checks. If you omit
+        # this parameter, GitHub verifies all unique contexts before creating
+        # a deployment. To bypass checking entirely, pass an empty array.
+        # Defaults to all unique contexts.
+        required_contexts: "*"
+        # JSON payload with extra information about the deployment. Default: ""
+        payload: ""
+        # Name for the target deployment environment (e.g., production, staging, qa).
+        # Default: production
+        environment: ${{ github.event.inputs.env_name }}
+        # Short description of the deployment. Default: ""
+        description: ""
+        # Specifies if the given environment is one that end-users directly
+        # interact with. Default: true when environment is production
+        # and false otherwise.
+        production_environment: false
+        # Specifies if the given environment is specific to the deployment
+        # and will no longer exist at some point in the future. Default: false
+        transient_environment: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
