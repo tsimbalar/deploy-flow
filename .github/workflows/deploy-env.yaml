@@ -19,6 +19,7 @@ jobs:
           step: start
           token: ${{ secrets.GITHUB_TOKEN }}
           env: ${{ github.event.inputs.env_name }}
+          no_override: false
 
       - name: Print steps result (for debug)
         env:
